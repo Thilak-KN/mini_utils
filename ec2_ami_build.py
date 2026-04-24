@@ -38,6 +38,7 @@ ret_val = 0
 
 class EC2VM:
     def __init__(self):
+        # pickup the credential from environment vars (set by jenkins-credential-manager) if the profile is default; use the profile name otherwise
         self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         self.ec2 = self.session.resource('ec2', region_name=args.region)
 
