@@ -48,7 +48,7 @@ def deal_instancetype(x):
 def instance_get():
     instance_types_list = []
     # pickup the credential from environment vars (set by jenkins-credential-manager) if the env-var is set; use the profile otherwise
-    self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+    session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
     client = session.client('ec2', region_name=args.region)
     filters = []
     if args.is_all:
