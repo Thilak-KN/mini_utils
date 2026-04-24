@@ -5,7 +5,7 @@ old: ec2 data source : https://www.ec2instances.info/?region=us-gov-west-1
 
 github : https://github.com/liangxiao1/mini_utils
 
-This tool is using for dump yaml file from ec2 data source and check whether 
+This tool is using for dump yaml file from ec2 data source and check whether
 the instance can run in this region.
 
 yaml file example:
@@ -13,7 +13,7 @@ instance_types: !mux
     i3.large:
         instance_type: i3.large
         cpu: 2
-        memory: 15.25 
+        memory: 15.25
         disks: 2
         net_perf : 10
         ipv6: True
@@ -47,7 +47,8 @@ def deal_instancetype(x):
 
 def instance_get():
     instance_types_list = []
-    session = boto3.session.Session(profile_name=args.profile, region_name=args.region)
+    # pickup the credential from environment vars (set by jenkins-credential-manager) if the env-var is set; use the profile otherwise
+    self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
     client = session.client('ec2', region_name=args.region)
     filters = []
     if args.is_all:
@@ -273,7 +274,8 @@ def instance_get():
 
 class EC2VM:
     def __init__(self):
-        self.session = boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        # pickup the credential from environment vars (set by jenkins-credential-manager) if the env-var is set; use the profile otherwise
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         self.ec2 = self.session.resource('ec2', region_name=args.region)
 
         self.ami_id = args.ami_id

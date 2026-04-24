@@ -38,8 +38,8 @@ ret_val = 0
 
 class EC2VM:
     def __init__(self):
-        # pickup the credential from environment vars (set by jenkins-credential-manager) if the profile is default; use the profile name otherwise
-        self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        # pickup the credential from environment vars (set by jenkins-credential-manager) if the env-var is set; use the profile otherwise
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         self.ec2 = self.session.resource('ec2', region_name=args.region)
 
         self.ami_id = args.ami_id
@@ -53,7 +53,7 @@ class EC2VM:
         '''
         check whether the vpc's default security group allow ssh connection
         '''
-        self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         ec2 = self.session.resource('ec2', region_name=region)
         try:
             vpc = ec2.Vpc(vpcid)
@@ -84,7 +84,7 @@ class EC2VM:
                 log.info("sg init error %s",sg.id)
                 return False
     def find_subnet(self):
-        self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         client = self.session.client('ec2', region_name=self.region)
         subnet_id = None
         subnets = client.describe_subnets()['Subnets']
@@ -112,7 +112,7 @@ class EC2VM:
         '''
         create a new igw and attach to vpc
         '''
-        self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         ec2 = self.session.resource('ec2', region_name=self.region)
         try:
             igw_new = client.create_internet_gateway(
@@ -145,7 +145,7 @@ class EC2VM:
         '''
         update default route table
         '''
-        self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         ec2 = self.session.resource('ec2', region_name=self.region)
 
         try:
@@ -186,7 +186,7 @@ class EC2VM:
         '''
         update default security group
         '''
-        self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         ec2 = self.session.resource('ec2', region_name=self.region)
         try:
             sgs = vpc.security_groups.all()
@@ -273,7 +273,7 @@ class EC2VM:
         '''
         create a new subnet
         '''
-        self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         ec2 = self.session.resource('ec2', region_name=self.region)
         try:
             subnet = vpc.create_subnet(
@@ -320,7 +320,7 @@ class EC2VM:
             log.info("Failed to create vpc %s", str(err))
         vpcid = vpc_new['Vpc']['VpcId']
         log.info("New vpc created %s", vpcid)
-        self.session = boto3.session.Session(region_name=args.region) if args.profile == 'default' else boto3.session.Session(profile_name=args.profile, region_name=args.region)
+        self.session = boto3.session.Session(region_name=args.region) if os.environ.get('AWS_ACCESS_KEY_ID') else boto3.session.Session(profile_name=args.profile, region_name=args.region)
         ec2 = self.session.resource('ec2', region_name=region)
         try:
             vpc = ec2.Vpc(vpcid)
